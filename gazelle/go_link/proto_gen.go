@@ -31,7 +31,7 @@ func (x *xlang) Loads() []rule.LoadInfo {
 	return []rule.LoadInfo{
 		{
 			Name:    "@golink//proto:proto.bzl",
-			Symbols: []string{"go_proto_link"},
+			Symbols: []string{"go_proto_link", "proto_library_descriptor"},
 		},
 	}
 }
@@ -58,6 +58,13 @@ func (x *xlang) GenerateRules(args language.GenerateArgs) language.GenerateResul
 		if r.Kind() == "go_proto_library" {
 			depName := r.Name()
 			r := rule.NewRule("go_proto_link", r.Name()+"_link")
+			r.SetAttr("dep", ":"+depName)
+			r.SetAttr("version", "v1")
+			rules = append(rules, r)
+			imports = append(imports, nil)
+		} else if r.Kind() == "proto_library" {
+			depName := r.Name()
+			r := rule.NewRule("proto_library_descriptor", r.Name()+"_descriptor")
 			r.SetAttr("dep", ":"+depName)
 			r.SetAttr("version", "v1")
 			rules = append(rules, r)
